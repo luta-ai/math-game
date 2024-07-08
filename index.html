@@ -2,14 +2,14 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>楽しい算数ゲーム</title>
     <style>
         body {
-            font-family: 'Comic Sans MS', 'Hiragino Maru Gothic ProN', cursive, sans-serif;
+            font-family: 'Hiragino Maru Gothic ProN', 'Rounded Mplus 1c', sans-serif;
             line-height: 1.6;
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -19,39 +19,49 @@
             background-repeat: repeat;
         }
         .container {
-            max-width: 500px;
-            width: 90%;
+            max-width: 100%;
+            width: 95%;
             background-color: white;
-            padding: 30px;
+            padding: 20px;
             border-radius: 20px;
             box-shadow: 0 0 20px rgba(0,0,0,0.2);
             border: 5px solid #4CAF50;
         }
-        h1, h2 {
+        h1 {
+            font-size: 1.8rem;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             color: #FF6347;
-            text-shadow: 2px 2px #FFD700;
+            text-shadow: 1px 1px #FFD700;
+        }
+        h2 {
+            font-size: 1.5rem;
+            text-align: center;
+            margin-bottom: 15px;
+            color: #FF6347;
+            text-shadow: 1px 1px #FFD700;
         }
         .game-selector {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            align-items: center;
             margin-bottom: 20px;
         }
         button {
-            padding: 15px 25px;
+            width: 80%;
+            padding: 15px;
+            margin: 10px 0;
             background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 50px;
             cursor: pointer;
-            font-size: 18px;
+            font-size: 1rem;
             font-weight: bold;
             transition: all 0.3s ease;
             box-shadow: 0 5px #388E3C;
         }
-        button:hover, button:active {
+        button:hover, button:focus {
             background-color: #45a049;
             transform: translateY(2px);
             box-shadow: 0 3px #388E3C;
@@ -66,13 +76,13 @@
         .game-info {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 20px;
-            font-size: 18px;
+            margin-bottom: 15px;
+            font-size: 1rem;
             font-weight: bold;
             color: #4CAF50;
         }
         .problem {
-            font-size: 36px;
+            font-size: 2rem;
             font-weight: bold;
             text-align: center;
             margin-bottom: 20px;
@@ -81,23 +91,23 @@
         }
         @keyframes bounce {
             from { transform: translateY(0px); }
-            to { transform: translateY(-10px); }
+            to { transform: translateY(-5px); }
         }
         input[type="number"] {
-            width: 100%;
+            width: calc(100% - 20px);
             padding: 15px;
             margin-bottom: 15px;
             border: 3px solid #4CAF50;
             border-radius: 10px;
-            font-size: 24px;
+            font-size: 1.5rem;
             text-align: center;
         }
         .feedback {
-            margin-top: 20px;
-            padding: 15px;
+            margin-top: 15px;
+            padding: 10px;
             border-radius: 10px;
             text-align: center;
-            font-size: 24px;
+            font-size: 1.2rem;
             font-weight: bold;
         }
         .correct {
@@ -112,47 +122,24 @@
         }
         @keyframes pulse {
             0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+            50% { transform: scale(1.05); }
             100% { transform: scale(1); }
         }
         @keyframes shake {
             0% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            50% { transform: translateX(10px); }
-            75% { transform: translateX(-10px); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
             100% { transform: translateX(0); }
         }
         .result-score {
-            font-size: 72px;
+            font-size: 3rem;
             font-weight: bold;
             color: #4CAF50;
             text-align: center;
             margin: 20px 0;
-            text-shadow: 2px 2px #FFD700;
+            text-shadow: 1px 1px #FFD700;
             animation: pulse 1s infinite;
-        }
-        @media (max-width: 480px) {
-            .container {
-                padding: 20px;
-            }
-            h1, h2 {
-                font-size: 24px;
-            }
-            .problem {
-                font-size: 28px;
-            }
-            .game-info {
-                font-size: 16px;
-            }
-            input[type="number"] {
-                font-size: 20px;
-            }
-            .feedback {
-                font-size: 20px;
-            }
-            .result-score {
-                font-size: 56px;
-            }
         }
     </style>
 </head>
@@ -185,15 +172,16 @@
 
         function generateProblem() {
             if (currentGame === 'multiplication') {
-                const multiplicand = Math.floor(Math.random() * 9) + 2; // 2から10までの数
-                const multiplier = Math.floor(Math.random() * 9) + 2; // 2から10までの数
+                const multiplicand = Math.floor(Math.random() * 90) + 10;
+                const multiplier = Math.floor(Math.random() * 9) + 1;
                 const product = multiplicand * multiplier;
                 return { multiplicand, multiplier, answer: product };
             } else if (currentGame === 'division') {
-                const divisor = Math.floor(Math.random() * 8) + 2; // 2から9までの数
-                const quotient = Math.floor(Math.random() * 9) + 2; // 2から10までの数
-                const dividend = divisor * quotient;
-                return { dividend, divisor, answer: quotient };
+                const divisor = Math.floor(Math.random() * 8) + 2;
+                const dividend = Math.floor(Math.random() * 890) + 100;
+                const roundedDividend = Math.floor(dividend / 10) * 10;
+                const quotient = Math.floor(roundedDividend / divisor);
+                return { dividend: roundedDividend, divisor, answer: quotient };
             } else {
                 throw new Error('Invalid game type');
             }
@@ -202,7 +190,11 @@
         function startGame() {
             problems = [];
             for (let i = 0; i < 10; i++) {
-                problems.push(generateProblem());
+                let problem;
+                do {
+                    problem = generateProblem();
+                } while (currentGame === 'division' && (problem.dividend % problem.divisor !== 0 || problem.answer < 10 || problem.answer >= 100));
+                problems.push(problem);
             }
             currentProblemIndex = 0;
             score = 0;
@@ -266,7 +258,11 @@
 
             currentProblemIndex++;
 
-            setTimeout(displayProblem, 1500);
+            if (currentProblemIndex < 10) {
+                setTimeout(displayProblem, 1500);
+            } else {
+                setTimeout(showResult, 1500);
+            }
         }
 
         function showResult() {

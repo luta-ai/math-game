@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>楽しい算数ゲーム</title>
+    <title>パパ算 v2</title>
     <style>
         body {
             font-family: 'Hiragino Maru Gothic ProN', 'Rounded Mplus 1c', sans-serif;
@@ -141,14 +141,37 @@
             text-shadow: 1px 1px #FFD700;
             animation: pulse 1s infinite;
         }
+        .ranking-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .ranking-table th, .ranking-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .ranking-table th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .ranking-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        #backToMenuButton, #answerButton, #saveScoreButton, #restartButton, #selectGameButton {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🧮 楽しい算数ゲーム 🧮</h1>
+        <h1>🧮 パパ算 v2 🧮</h1>
         <div class="game-selector">
             <button id="multiplicationButton">✖️ かけ算チャレンジ</button>
             <button id="divisionButton">➗ わり算マスター</button>
+            <button id="rankingButton">🏆 ランキング</button>
         </div>
         <div id="gameArea"></div>
     </div>
@@ -159,6 +182,8 @@
         let problems = [];
         let currentProblemIndex = 0;
         let score = 0;
+        let startTime;
+        let endTime;
 
         function startMultiplicationGame() {
             currentGame = 'multiplication';
@@ -198,11 +223,13 @@
             }
             currentProblemIndex = 0;
             score = 0;
+            startTime = new Date();
             displayProblem();
         }
 
         function displayProblem() {
             if (currentProblemIndex >= problems.length) {
+                endTime = new Date();
                 showResult();
                 return;
             }
@@ -261,25 +288,95 @@
             if (currentProblemIndex < 10) {
                 setTimeout(displayProblem, 1500);
             } else {
+                endTime = new Date();
                 setTimeout(showResult, 1500);
             }
         }
 
         function showResult() {
+            const timeTaken = (endTime - startTime) / 1000; // 秒数に変換
             gameArea.innerHTML = `
                 <h2>ゲーム終了！</h2>
                 <div class="result-score">${score} / 10</div>
+                <p>かかった時間: ${timeTaken.toFixed(2)}秒</p>
                 <p>すばらしい！</p>
+                ${score === 10 ? `<button id="saveScoreButton">スコアを保存</button>` : ''}
                 <button id="restartButton">もう一度プレイ</button>
                 <button id="selectGameButton">ゲーム選択に戻る</button>
             `;
+            if (score === 10) {
+                document.getElementById('saveScoreButton').addEventListener('click', saveScore);
+            }
             document.getElementById('restartButton').addEventListener('click', startGame);
             document.getElementById('selectGameButton').addEventListener('click', showGameSelector);
+        }
+
+        function saveScore() {
+            const playerName = prompt('あなたの名前を入力してください：');
+            if (playerName) {
+                const gameType = currentGame === 'multiplication' ? 'かけ算' : 'わり算';
+                const timeTaken = (endTime - startTime) / 1000; // 秒数に変換
+                const newScore = {
+                    name: playerName,
+                    time: timeTaken,
+                    date: new Date().toLocaleString(),
+                    type: gameType
+                };
+
+                let rankings = JSON.parse(localStorage.getItem('mathGameRankings')) || {};
+                if (!rankings[gameType]) {
+                    rankings[gameType] = [];
+                }
+                rankings[gameType].push(newScore);
+                rankings[gameType].sort((a, b) => a.time - b.time);
+                rankings[gameType] = rankings[gameType].slice(0, 10);  // トップ10のみ保持
+
+                localStorage.setItem('mathGameRankings', JSON.stringify(rankings));
+                alert('スコアが保存されました！');
+                showRanking();
+            }
         }
 
         function showGameSelector() {
             gameArea.innerHTML = '';
             document.querySelector('.game-selector').style.display = 'flex';
+        }
+
+        function showRanking() {
+            const rankings = JSON.parse(localStorage.getItem('mathGameRankings')) || {};
+            
+            let rankingHTML = '<h2>ランキング</h2>';
+            
+            for (const gameType in rankings) {
+                rankingHTML += `
+                    <h3>${gameType}ランキング</h3>
+                    <table class="ranking-table">
+                        <tr>
+                            <th>順位</th>
+                            <th>名前</th>
+                            <th>タイム</th>
+                            <th>日付</th>
+                        </tr>
+                `;
+                
+                rankings[gameType].forEach((score, index) => {
+                    rankingHTML += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${score.name}</td>
+                            <td>${score.time.toFixed(2)}秒</td>
+                            <td>${score.date}</td>
+                        </tr>
+                    `;
+                });
+                
+                rankingHTML += '</table>';
+            }
+            
+            rankingHTML += '<button id="backToMenuButton">メニューに戻る</button>';
+            
+            gameArea.innerHTML = rankingHTML;
+            document.getElementById('backToMenuButton').addEventListener('click', showGameSelector);
         }
 
         document.getElementById('multiplicationButton').addEventListener('click', function() {
@@ -292,7 +389,13 @@
             startDivisionGame();
         });
 
+        document.getElementById('rankingButton').addEventListener('click', function() {
+            document.querySelector('.game-selector').style.display = 'none';
+            showRanking();
+        });
+
         showGameSelector();
     </script>
 </body>
 </html>
+
